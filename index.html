@@ -3802,10 +3802,20 @@
                             null,
                             2,
                         ) +
-                        "\n\nHOW TO EDIT: 1) First, list ALL new nodes in nodes_to_add (id, label, color, shape, x, y). 2) Then, list edges in edges_to_add using node IDs. 3) To modify a node, use nodes_to_update. 4) To delete, use node_ids_to_delete or edge_ids_to_delete. 5) To remove an arrow, use edges_to_update with arrow:false. 6) ALWAYS respond with a text message BEFORE calling the tool. HANDLES (REQUIRED): For EVERY edge, calculate sourceHandle and targetHandle: if target.x > source.x → s-r-50 + t-l-50; if target.x < source.x → s-l-50 + t-r-50; if target.y > source.y → s-b-50 + t-t-50; if target.y < source.y → s-t-50 + t-b-50. For multiple edges between same nodes, use positions 25 and 75. LAYOUT (REQUIRED): every new node MUST have x and y. Place the main node at x:0, y:0. Main branches at 200px (e.g. x:200, x:-200, y:200, y:-200). Sub-nodes at 150px from parent. Example: {id:n1, label:Test, x:200, y:0}. Design: rectangle by default, circle for key concepts, diamond for decisions, pill for labels. Colors: " +
-                        COLORS.map((c) => c.name).join(", ");
-
-                    // Smart trim conversation history based on context budget
+                        "\n\nTHINKING PROCESS — Follow these 6 phases in your reasoning:\n" +
+                        "PHASE 1 — ANALYZE: What type of diagram? Mindmap, flowchart, timeline, org chart, or free network?\n" +
+                        "PHASE 2 — DESIGN: List all nodes (id, label, color, shape) and edges (source, target).\n" +
+                        "PHASE 3 — POSITION: Calculate x,y based on diagram type:\n" +
+                        "  Mindmap: root at (0,0), branches at radius 200px, sub-branches at 150px from parent.\n" +
+                        "  Flowchart: nodes at x intervals of 250px, y centered. Diamond for decisions.\n" +
+                        "  Timeline: nodes at x intervals of 250px, y alternating ±50px for readability.\n" +
+                        "  Org chart: root at y:-300, children spread on x (±200px), levels spaced 150px on y.\n" +
+                        "  Free: related nodes clustered together, unrelated clusters apart (400px+).\n" +
+                        "PHASE 4 — HANDLES: For each edge, if target.x>source.x → s-r-50+t-l-50. If target.x<source.x → s-l-50+t-r-50. If target.y>source.y → s-b-50+t-t-50. Vary 25/75 for multiple edges.\n" +
+                        "PHASE 5 — VALIDATE: All IDs unique, all edge targets exist in nodes_to_add, colors valid.\n" +
+                        "PHASE 6 — EXECUTE: Call edit_mindmap. Then respond with a short confirmation.\n" +
+                        "Colors: " + COLORS.map((c) => c.name).join(", ") + ". Shapes: rectangle (default), circle (key concepts), diamond (decisions), pill (labels).\n" +
+                        "                    // Smart trim conversation history based on context budget
                     const contextLimit =
                         (activeProvider?.contextSize || 8192) * 4;
                     const sysSize = sysContent.length;
@@ -4372,7 +4382,17 @@
                                                                   className:
                                                                       "ai-message-text",
                                                               },
-                                                              m.role === "assistant" ? h("span", { dangerouslySetInnerHTML: { __html: renderMarkdown(m.text) } }) : m.text,
+                                                              m.role ===
+                                                                  "assistant"
+                                                                  ? h("span", {
+                                                                        dangerouslySetInnerHTML:
+                                                                            {
+                                                                                __html: renderMarkdown(
+                                                                                    m.text,
+                                                                                ),
+                                                                            },
+                                                                    })
+                                                                  : m.text,
                                                           ),
                                                       )
                                                     : null,
