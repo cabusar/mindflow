@@ -6,6 +6,9 @@ A modern, single-file HTML5 mindmap editor with an AI copilot. No build, no serv
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-cabusar-yellow?style=flat&logo=buymeacoffee)](https://buymeacoffee.com/cabusar)
 
+> **💭 Why this exists** — I built this out of pure curiosity. I needed a simple, free mindmap tool and wondered: *can I make one myself with DeepSeek, in a single HTML file?* The AI assistant idea came later, just for fun. It cost a few euros in tokens and about two weeks of tinkering. No pretension — it's free, it works, but there are probably bugs. If you find one, open an issue and I'll take a look. :)
+
+
 ![MindFlow Screenshot](Screenshot_20260513_135627.png)
 
 ## ✨ Features
@@ -136,6 +139,9 @@ Then add provider: endpoint `http://localhost:11434/v1`, model `llama3.2`
 ## 📄 License
 
 MIT — [GitHub Repository](https://github.com/cabusar/mindflow) | [Buy Me a Coffee ☕](https://buymeacoffee.com/cabusar)
+
+> **💭 Why this exists** — I built this out of pure curiosity. I needed a simple, free mindmap tool and wondered: *can I make one myself with DeepSeek, in a single HTML file?* The AI assistant idea came later, just for fun. It cost a few euros in tokens and about two weeks of tinkering. No pretension — it's free, it works, but there are probably bugs. If you find one, open an issue and I'll take a look. :)
+
 
 ## 🙏 Acknowledgments
 
