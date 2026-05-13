@@ -6,19 +6,7 @@ A modern, single-file HTML5 mindmap editor with an AI copilot. No build, no serv
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-cabusar-yellow?style=flat&logo=buymeacoffee)](https://buymeacoffee.com/cabusar)
 
-> **💭 Why this exists** — I had fun building a mindmap tool in a single monolithic HTML file. I used DeepSeek v4 to generate the code. Don't ask me why I started this two weeks ago, I have no valid reason. ^^
->
-> Later I found it fun to add an AI assistant to help generate the diagrams. It's not perfect and sometimes does weird stuff, but overall it works.
->
-> Naturally, being a monolithic file, AI models start struggling to process the whole thing properly. But that's part of the interest — it forces you to be specific and keep the full picture of all existing features and goals in mind.
->
-> The AI assistant works well locally (tested with Gemma 4 26B Q4_K_M via LM Studio).
->
-> Anyway, it's free, no account, no data theft, no nothing. There shouldn't be any security issues.
->
-> If the tool interests you, you can help improve it. I'll keep tinkering and fixing bugs as I run into them. I might try adding features — my only self-imposed constraint is that everything must stay in a single monolithic file.
->
-> *(And if you feel like contributing towards an RTX 6000 Pro Blackwell, don't hesitate via the Buy Me a Coffee on GitHub. I'm about €10,000 short :D)*
+> **💭 Why this exists** — I built this out of pure curiosity. I needed a simple, free mindmap tool and wondered: *can I make one myself with DeepSeek, in a single HTML file?* The AI assistant idea came later, just for fun. It cost a few euros in tokens and about two weeks of tinkering. No pretension — it's free, it works, but there are probably bugs. If you find one, open an issue and I'll take a look. :)
 
 
 ![MindFlow Screenshot](Screenshot_20260513_135627.png)
@@ -152,19 +140,7 @@ Then add provider: endpoint `http://localhost:11434/v1`, model `llama3.2`
 
 MIT — [GitHub Repository](https://github.com/cabusar/mindflow) | [Buy Me a Coffee ☕](https://buymeacoffee.com/cabusar)
 
-> **💭 Why this exists** — I had fun building a mindmap tool in a single monolithic HTML file. I used DeepSeek v4 to generate the code. Don't ask me why I started this two weeks ago, I have no valid reason. ^^
->
-> Later I found it fun to add an AI assistant to help generate the diagrams. It's not perfect and sometimes does weird stuff, but overall it works.
->
-> Naturally, being a monolithic file, AI models start struggling to process the whole thing properly. But that's part of the interest — it forces you to be specific and keep the full picture of all existing features and goals in mind.
->
-> The AI assistant works well locally (tested with Gemma 4 26B Q4_K_M via LM Studio).
->
-> Anyway, it's free, no account, no data theft, no nothing. There shouldn't be any security issues.
->
-> If the tool interests you, you can help improve it. I'll keep tinkering and fixing bugs as I run into them. I might try adding features — my only self-imposed constraint is that everything must stay in a single monolithic file.
->
-> *(And if you feel like contributing towards an RTX 6000 Pro Blackwell, don't hesitate via the Buy Me a Coffee on GitHub. I'm about €10,000 short :D)*
+> **💭 Why this exists** — I built this out of pure curiosity. I needed a simple, free mindmap tool and wondered: *can I make one myself with DeepSeek, in a single HTML file?* The AI assistant idea came later, just for fun. It cost a few euros in tokens and about two weeks of tinkering. No pretension — it's free, it works, but there are probably bugs. If you find one, open an issue and I'll take a look. :)
 
 
 ## 🙏 Acknowledgments
