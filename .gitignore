@@ -1,2 +1,2 @@
-index.html.bak
-.kiro/
+*.md
+!README.md
