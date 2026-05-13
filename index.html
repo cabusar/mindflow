@@ -527,7 +527,7 @@
                 background-size: cover;
                 background-position: center;
                 color: #fff;
-                text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
             }
             .mind-node.is-selected {
                 box-shadow:
@@ -2713,11 +2713,7 @@
                               : null,
                       ]
                     : [
-                          h(
-                              "div",
-                              { key: "title" },
-                              data.label || "Untitled",
-                          ),
+                          h("div", { key: "title" }, data.label || "Untitled"),
                           data.description
                               ? h(
                                     "div",
@@ -2734,15 +2730,20 @@
                     pill: " is-pill",
                 };
                 const shapeClass = SHAPE_CLASSES[shape] ?? "";
+                const hasImage = !!data.image;
                 return h(
                     "div",
                     {
                         className:
                             "mind-node" +
                             (selected ? " is-selected" : "") +
-                            shapeClass,
+                            shapeClass +
+                            (hasImage ? " has-image" : ""),
                         style: {
-                            background: bg,
+                            background: hasImage ? undefined : bg,
+                            backgroundImage: hasImage
+                                ? "url(" + data.image + ")"
+                                : undefined,
                             borderColor: border,
                             "--handle-color": border,
                         },
@@ -4371,7 +4372,7 @@
                                                                   className:
                                                                       "ai-message-text",
                                                               },
-                                                              m.text,
+                                                              m.role === "assistant" ? h("span", { dangerouslySetInnerHTML: { __html: renderMarkdown(m.text) } }) : m.text,
                                                           ),
                                                       )
                                                     : null,
@@ -5470,128 +5471,280 @@
                 return (json.data || []).map((m) => m.id).sort();
             }
 
-
-
             // ---- AI tool calling ----
             const AI_TOOLS = [
                 {
                     type: "function",
                     function: {
                         name: "edit_mindmap",
-                        description: "Edit the mindmap. ONLY provide elements to add, modify or delete.",
+                        description:
+                            "Edit the mindmap. ONLY provide elements to add, modify or delete.",
                         parameters: {
                             type: "object",
                             properties: {
                                 nodes_to_add: {
-                                    type: "array", description: "New nodes",
+                                    type: "array",
+                                    description: "New nodes",
                                     items: {
                                         type: "object",
                                         properties: {
-                                            id: { type: "string" }, label: { type: "string" },
-                                            color: { type: "string", enum: COLORS.map((c) => c.name) },
-                                            shape: { type: "string", enum: ["rectangle","circle","diamond","pill"] },
-                                            connect_to: { type: "string", description: "Parent node ID to connect to" },
-                                            x: { type: "number", description: "X position (0=center)" },
-                                            y: { type: "number", description: "Y position (0=center)" }
-                                        }, required: ["id","label"]
-                                    }
+                                            id: { type: "string" },
+                                            label: { type: "string" },
+                                            color: {
+                                                type: "string",
+                                                enum: COLORS.map((c) => c.name),
+                                            },
+                                            shape: {
+                                                type: "string",
+                                                enum: [
+                                                    "rectangle",
+                                                    "circle",
+                                                    "diamond",
+                                                    "pill",
+                                                ],
+                                            },
+                                            connect_to: {
+                                                type: "string",
+                                                description:
+                                                    "Parent node ID to connect to",
+                                            },
+                                            x: {
+                                                type: "number",
+                                                description:
+                                                    "X position (0=center)",
+                                            },
+                                            y: {
+                                                type: "number",
+                                                description:
+                                                    "Y position (0=center)",
+                                            },
+                                        },
+                                        required: ["id", "label"],
+                                    },
                                 },
                                 nodes_to_update: {
-                                    type: "array", description: "Nodes to modify",
+                                    type: "array",
+                                    description: "Nodes to modify",
                                     items: {
                                         type: "object",
                                         properties: {
-                                            id: { type: "string" }, label: { type: "string" },
-                                            color: { type: "string", enum: COLORS.map((c) => c.name) },
-                                            shape: { type: "string", enum: ["rectangle","circle","diamond","pill"] },
-                                            description: { type: "string" }
-                                        }, required: ["id"]
-                                    }
-                                },
-                                node_ids_to_delete: { type: "array", items: { type: "string" } },
-                                edges_to_add: {
-                                    type: "array", description: "New edges",
-                                    items: {
-                                        type: "object",
-                                        properties: {
-                                            source: { type: "string" }, target: { type: "string" },
+                                            id: { type: "string" },
                                             label: { type: "string" },
-                                            arrow: { type: "boolean", description: "Show arrow. Default: true" },
-                                            sourceHandle: { type: "string", description: "Source handle: s-{side}-{pos}" },
-                                            targetHandle: { type: "string", description: "Target handle: t-{side}-{pos}" }
-                                        }, required: ["source","target"]
-                                    }
+                                            color: {
+                                                type: "string",
+                                                enum: COLORS.map((c) => c.name),
+                                            },
+                                            shape: {
+                                                type: "string",
+                                                enum: [
+                                                    "rectangle",
+                                                    "circle",
+                                                    "diamond",
+                                                    "pill",
+                                                ],
+                                            },
+                                            description: { type: "string" },
+                                        },
+                                        required: ["id"],
+                                    },
+                                },
+                                node_ids_to_delete: {
+                                    type: "array",
+                                    items: { type: "string" },
+                                },
+                                edges_to_add: {
+                                    type: "array",
+                                    description: "New edges",
+                                    items: {
+                                        type: "object",
+                                        properties: {
+                                            source: { type: "string" },
+                                            target: { type: "string" },
+                                            label: { type: "string" },
+                                            arrow: {
+                                                type: "boolean",
+                                                description:
+                                                    "Show arrow. Default: true",
+                                            },
+                                            sourceHandle: {
+                                                type: "string",
+                                                description:
+                                                    "Source handle: s-{side}-{pos}",
+                                            },
+                                            targetHandle: {
+                                                type: "string",
+                                                description:
+                                                    "Target handle: t-{side}-{pos}",
+                                            },
+                                        },
+                                        required: ["source", "target"],
+                                    },
                                 },
                                 edges_to_update: {
-                                    type: "array", description: "Edges to modify",
+                                    type: "array",
+                                    description: "Edges to modify",
                                     items: {
                                         type: "object",
                                         properties: {
-                                            id: { type: "string" }, label: { type: "string" },
+                                            id: { type: "string" },
+                                            label: { type: "string" },
                                             arrow: { type: "boolean" },
                                             sourceHandle: { type: "string" },
-                                            targetHandle: { type: "string" }
-                                        }, required: ["id"]
-                                    }
+                                            targetHandle: { type: "string" },
+                                        },
+                                        required: ["id"],
+                                    },
                                 },
-                                edge_ids_to_delete: { type: "array", items: { type: "string" } }
-                            }
-                        }
-                    }
-                }
+                                edge_ids_to_delete: {
+                                    type: "array",
+                                    items: { type: "string" },
+                                },
+                            },
+                        },
+                    },
+                },
             ];
 
             function executeToolCall(toolName, args, state) {
-                if (toolName !== "edit_mindmap") return { success: false, error: "Unknown tool" };
+                if (toolName !== "edit_mindmap")
+                    return { success: false, error: "Unknown tool" };
                 const patches = [];
-                const nextId = state.nodes.reduce((max, n) => Math.max(max, parseInt(n.id) || 0), 0) + 1;
+                const nextId =
+                    state.nodes.reduce(
+                        (max, n) => Math.max(max, parseInt(n.id) || 0),
+                        0,
+                    ) + 1;
                 let currentId = nextId;
                 for (const n of args.nodes_to_add || []) {
                     if (!n.id || !n.label) continue;
-                    patches.push({ op: "add_node", id: n.id, label: n.label, color: n.color, shape: n.shape, x: n.x, y: n.y, description: n.description, image: n.image });
-                    if (n.connect_to) patches.push({ op: "add_edge", source: n.connect_to, target: n.id });
+                    patches.push({
+                        op: "add_node",
+                        id: n.id,
+                        label: n.label,
+                        color: n.color,
+                        shape: n.shape,
+                        x: n.x,
+                        y: n.y,
+                        description: n.description,
+                        image: n.image,
+                    });
+                    if (n.connect_to)
+                        patches.push({
+                            op: "add_edge",
+                            source: n.connect_to,
+                            target: n.id,
+                        });
                 }
                 for (const n of args.nodes_to_update || []) {
                     if (!n.id) continue;
-                    patches.push({ op: "update_node", id: n.id, label: n.label, color: n.color, shape: n.shape, description: n.description });
+                    patches.push({
+                        op: "update_node",
+                        id: n.id,
+                        label: n.label,
+                        color: n.color,
+                        shape: n.shape,
+                        description: n.description,
+                    });
                 }
-                for (const id of args.node_ids_to_delete || []) patches.push({ op: "delete_node", id });
+                for (const id of args.node_ids_to_delete || [])
+                    patches.push({ op: "delete_node", id });
                 for (const e of args.edges_to_add || []) {
                     if (!e.source || !e.target) continue;
-                    patches.push({ op: "add_edge", source: e.source, target: e.target, label: e.label, arrow: e.arrow !== false, sourceHandle: e.sourceHandle, targetHandle: e.targetHandle });
+                    patches.push({
+                        op: "add_edge",
+                        source: e.source,
+                        target: e.target,
+                        label: e.label,
+                        arrow: e.arrow !== false,
+                        sourceHandle: e.sourceHandle,
+                        targetHandle: e.targetHandle,
+                    });
                 }
                 for (const e of args.edges_to_update || []) {
                     if (!e.id) continue;
-                    patches.push({ op: "update_edge", id: e.id, label: e.label, arrow: e.arrow, sourceHandle: e.sourceHandle, targetHandle: e.targetHandle });
+                    patches.push({
+                        op: "update_edge",
+                        id: e.id,
+                        label: e.label,
+                        arrow: e.arrow,
+                        sourceHandle: e.sourceHandle,
+                        targetHandle: e.targetHandle,
+                    });
                 }
-                for (const id of args.edge_ids_to_delete || []) patches.push({ op: "delete_edge", id });
-                if (!patches.length) return { success: false, error: "No changes specified" };
-                const clean = patches.map((p) => { const c = { op: p.op }; for (const k of Object.keys(p)) { if (p[k] !== undefined) c[k] = p[k]; } return c; });
+                for (const id of args.edge_ids_to_delete || [])
+                    patches.push({ op: "delete_edge", id });
+                if (!patches.length)
+                    return { success: false, error: "No changes specified" };
+                const clean = patches.map((p) => {
+                    const c = { op: p.op };
+                    for (const k of Object.keys(p)) {
+                        if (p[k] !== undefined) c[k] = p[k];
+                    }
+                    return c;
+                });
                 const validation = validatePatches(clean, state);
-                if (!validation.valid) return { success: false, error: validation.errors.join("; ") };
+                if (!validation.valid)
+                    return {
+                        success: false,
+                        error: validation.errors.join("; "),
+                    };
                 const result = applyPatches(state, clean, currentId);
                 return { success: true, newState: result };
             }
 
-            async function* streamLLM(endpoint, model, key, messages, onThinking, externalSignal) {
+            async function* streamLLM(
+                endpoint,
+                model,
+                key,
+                messages,
+                onThinking,
+                externalSignal,
+            ) {
                 const url = endpoint.replace(/\/+$/, "") + "/chat/completions";
                 const headers = { "Content-Type": "application/json" };
                 if (key) headers["Authorization"] = "Bearer " + key;
-                const body = JSON.stringify({ model: model || "", messages, tools: AI_TOOLS, tool_choice: "auto", temperature: 0.7, stream: true });
+                const body = JSON.stringify({
+                    model: model || "",
+                    messages,
+                    tools: AI_TOOLS,
+                    tool_choice: "auto",
+                    temperature: 0.7,
+                    stream: true,
+                });
                 const controller = new AbortController();
-                if (externalSignal) externalSignal.addEventListener("abort", () => controller.abort());
-                const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+                if (externalSignal)
+                    externalSignal.addEventListener("abort", () =>
+                        controller.abort(),
+                    );
+                const timer = setTimeout(
+                    () => controller.abort(),
+                    AI_TIMEOUT_MS,
+                );
                 try {
-                    const resp = await fetch(url, { method: "POST", headers, body, signal: controller.signal });
-                    if (!resp.ok) { const t = await resp.text().catch(() => ""); throw new Error("HTTP " + resp.status + (t ? " : " + t.slice(0, 200) : "")); }
+                    const resp = await fetch(url, {
+                        method: "POST",
+                        headers,
+                        body,
+                        signal: controller.signal,
+                    });
+                    if (!resp.ok) {
+                        const t = await resp.text().catch(() => "");
+                        throw new Error(
+                            "HTTP " +
+                                resp.status +
+                                (t ? " : " + t.slice(0, 200) : ""),
+                        );
+                    }
                     const reader = resp.body.getReader();
                     const decoder = new TextDecoder();
-                    let buffer = "", toolCalls = {};
+                    let buffer = "",
+                        toolCalls = {};
                     while (true) {
                         const { done, value } = await reader.read();
                         if (done) break;
                         buffer += decoder.decode(value, { stream: true });
-                        const lines = buffer.split("\n"); buffer = lines.pop() || "";
+                        const lines = buffer.split("\n");
+                        buffer = lines.pop() || "";
                         for (const line of lines) {
                             const t = line.trim();
                             if (!t || !t.startsWith("data: ")) continue;
@@ -5601,47 +5754,76 @@
                                 const json = JSON.parse(data);
                                 const delta = json.choices?.[0]?.delta;
                                 if (!delta) continue;
-                                if (delta.reasoning_content && onThinking) onThinking(delta.reasoning_content);
-                                if (delta.content) yield { type: "text", text: delta.content };
+                                if (delta.reasoning_content && onThinking)
+                                    onThinking(delta.reasoning_content);
+                                if (delta.content)
+                                    yield { type: "text", text: delta.content };
                                 if (delta.tool_calls) {
                                     for (const tc of delta.tool_calls) {
                                         const idx = tc.index;
-                                        if (!toolCalls[idx]) toolCalls[idx] = { id: tc.id || "", name: "", arguments: "" };
+                                        if (!toolCalls[idx])
+                                            toolCalls[idx] = {
+                                                id: tc.id || "",
+                                                name: "",
+                                                arguments: "",
+                                            };
                                         if (tc.id) toolCalls[idx].id = tc.id;
-                                        if (tc.function?.name) toolCalls[idx].name += tc.function.name;
-                                        if (tc.function?.arguments) toolCalls[idx].arguments += tc.function.arguments;
+                                        if (tc.function?.name)
+                                            toolCalls[idx].name +=
+                                                tc.function.name;
+                                        if (tc.function?.arguments)
+                                            toolCalls[idx].arguments +=
+                                                tc.function.arguments;
                                     }
                                 }
                             } catch {}
                         }
                     }
-                    const calls = Object.values(toolCalls).filter((tc) => tc.name);
+                    const calls = Object.values(toolCalls).filter(
+                        (tc) => tc.name,
+                    );
                     if (calls.length) yield { type: "tool_calls", calls };
-                } finally { clearTimeout(timer); }
+                } finally {
+                    clearTimeout(timer);
+                }
             }
 
             async function callLLM(endpoint, model, key, prompt) {
                 const url = endpoint.replace(/\/+$/, "") + "/chat/completions";
                 const headers = { "Content-Type": "application/json" };
                 if (key) headers["Authorization"] = "Bearer " + key;
-                const body = JSON.stringify({ model: model || "", messages: [{ role: "user", content: prompt }], temperature: 0.7 });
+                const body = JSON.stringify({
+                    model: model || "",
+                    messages: [{ role: "user", content: prompt }],
+                    temperature: 0.7,
+                });
                 const controller = new AbortController();
-                const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+                const timer = setTimeout(
+                    () => controller.abort(),
+                    AI_TIMEOUT_MS,
+                );
                 try {
-                    const resp = await fetch(url, { method: "POST", headers, body, signal: controller.signal });
+                    const resp = await fetch(url, {
+                        method: "POST",
+                        headers,
+                        body,
+                        signal: controller.signal,
+                    });
                     if (!resp.ok) throw new Error("HTTP " + resp.status);
                     const json = await resp.json();
                     return json.choices?.[0]?.message?.content ?? "";
-                } finally { clearTimeout(timer); }
+                } finally {
+                    clearTimeout(timer);
+                }
             }
 
-
-            
             /** Simple markdown to HTML converter */
             function renderMarkdown(text) {
                 if (!text) return "";
                 let html = text
-                    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
                     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
                     .replace(/\*(.+?)\*/g, "<em>$1</em>")
                     .replace(/`(.+?)`/g, "<code>$1</code>")
@@ -5649,7 +5831,7 @@
                 return html;
             }
 
-                        function parsePatchResponse(text) {
+            function parsePatchResponse(text) {
                 // Try to find a JSON array in the text
                 const match = text.match(/\[[\s\S]*\]/);
                 if (!match) return null;
@@ -5754,7 +5936,9 @@
                                     '" introuvable. Ajoute ce nœud dans nodes_to_add d abord.',
                             );
                         if (p.source === p.target)
-                            errors.push("Patch " + i + " : self-loop forbidden");
+                            errors.push(
+                                "Patch " + i + " : self-loop forbidden",
+                            );
                     }
                     if (
                         p.op === "delete_edge" ||
@@ -5788,11 +5972,19 @@
                                 y: p.y ?? Math.random() * 200 - 100,
                             },
                             data: {
-                                label: (p.label ?? "New node").slice(0, MAX_TEXT_LENGTH),
-                                color: COLORS.some((c) => c.name === p.color) ? p.color : COLORS[0].name,
-                                shape: VALID_NODE_SHAPES.has(p.shape) ? p.shape : "rectangle",
+                                label: (p.label ?? "New node").slice(
+                                    0,
+                                    MAX_TEXT_LENGTH,
+                                ),
+                                color: COLORS.some((c) => c.name === p.color)
+                                    ? p.color
+                                    : COLORS[0].name,
+                                shape: VALID_NODE_SHAPES.has(p.shape)
+                                    ? p.shape
+                                    : "rectangle",
                                 description: p.description || "",
-                                image: p.image || ""                            },
+                                image: p.image || "",
+                            },
                         });
                     }
                     if (p.op === "update_node") {
