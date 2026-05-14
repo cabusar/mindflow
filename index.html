@@ -3812,10 +3812,13 @@
                         "  Org chart: root at y:-300, children spread on x (±200px), levels spaced 150px on y.\n" +
                         "  Free: related nodes clustered together, unrelated clusters apart (400px+).\n" +
                         "PHASE 4 — HANDLES: For each edge, if target.x>source.x → s-r-50+t-l-50. If target.x<source.x → s-l-50+t-r-50. If target.y>source.y → s-b-50+t-t-50. Vary 25/75 for multiple edges.\n" +
-                        "PHASE 5 — VALIDATE: All IDs unique, all edge targets exist in nodes_to_add, colors valid.\n" +
+                        "PHASE 5 — VALIDATE: IDs in nodes_to_add must NOT already exist in the schema (use nodes_to_update for existing nodes). All edge targets must be in nodes_to_add or already exist. Colors valid.\n" +
                         "PHASE 6 — EXECUTE: Call edit_mindmap. Then respond with a short confirmation.\n" +
-                        "Colors: " + COLORS.map((c) => c.name).join(", ") + ". Shapes: rectangle (default), circle (key concepts), diamond (decisions), pill (labels).\n" +
-                        "                    // Smart trim conversation history based on context budget
+                        "Colors: " +
+                        COLORS.map((c) => c.name).join(", ") +
+                        ". Shapes: rectangle (default), circle (key concepts), diamond (decisions), pill (labels).";
+
+                    // Smart trim conversation history based on context budget
                     const contextLimit =
                         (activeProvider?.contextSize || 8192) * 4;
                     const sysSize = sysContent.length;
